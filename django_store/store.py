@@ -42,7 +42,8 @@ def _get_content_type(file_ext):
 
 class MinioStore(object):
 
-    def __init__(self, endpoint=None, access_key=None, secret_key=None, secure=None, bucket_name=None):
+    def __init__(self, endpoint=None, access_key=None, secret_key=None, secure=None, bucket_name=None,
+                 session_token=None, region=None, http_client=None):
         try:
             if endpoint is None:
                 self.endpoint = settings.MINIO_ENDPOINT
@@ -55,8 +56,13 @@ class MinioStore(object):
             if bucket_name is None:
                 self.bucket_name = settings.MINIO_BUCKET_NAME
 
-            self.mc = Minio(self.endpoint, self.access_key,
-                            self.secret_key, self.secure)
+            self.session_token = session_token
+            self.region = region
+            self.http_client = http_client
+
+            self.mc = Minio(endpoint=self.endpoint, access_key=self.access_key,
+                            secret_key=self.secret_key, session_token=session_token,
+                            secure=self.secure, region=region, http_client=http_client)
         except ResponseError as err:
             raise err
 
